@@ -1,7 +1,7 @@
-export const SET_FETCHED_RECIPES = 'SET_FETCHED_RECIPES';
-export const setFetchedRecipes = results => {
+export const SET_FETCHED_VIDEOS = 'SET_FETCHED_VIDEOS';
+export const setFetchedVideos = results => {
   return {
-    type: SET_FETCHED_RECIPES,
+    type: SET_FETCHED_VIDEOS,
     results,
   };
 };
@@ -39,26 +39,21 @@ export const isFetching = boolean => {
   };
 };
 
-export const fetchRecipes = query => {
+export const fetchVideos = () => {
   return async dispatch => {
-    if (query) {
-      dispatch(networkError(false));
-      dispatch(isFetching(true));
-      try {
-        const response = await fetch(
-          `https://api.edamam.com/search?q=${query}&app_id=${process.env.REACT_APP_API_ID}&app_key=${process.env.REACT_APP_API_KEY}`,
-        );
-        const data = await response.json();
-        data.hits.length !== 0
-          ? dispatch(setFetchedRecipes(data.hits)) &&
-            dispatch(isFetching(false))
-          : dispatch(setFetchedRecipes([query])) && dispatch(isFetching(false));
-      } catch (error) {
-        dispatch(isFetching(false));
-        dispatch(networkError(true));
-      }
-    } else {
-      dispatch(setFetchedRecipes([]));
+    dispatch(networkError(false));
+    dispatch(isFetching(true));
+    try {
+      const response = await fetch(
+        `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=12&topicId=/m/068hy&type=video&videoEmbeddable=true&key=${process.env.REACT_APP_API_KEY}`,
+      );
+      const data = await response.json();
+      console.log(data.items);
+      dispatch(setFetchedVideos(data.items));
+      dispatch(isFetching(false));
+    } catch (error) {
+      dispatch(isFetching(false));
+      dispatch(networkError(true));
     }
   };
 };

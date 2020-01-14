@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useDispatch } from 'react-redux';
+import { fetchVideos } from '../store/actions';
 import styled from 'styled-components/macro';
 import { useHistory, useLocation, NavLink } from 'react-router-dom';
-import { fetchRecipes } from '../store/actions';
-import { useDispatch } from 'react-redux';
 
 const HeaderBar = styled.header`
   position: fixed;
@@ -78,13 +78,12 @@ const StyledNavLink = styled(NavLink)`
   width: 100%;
   padding: 0px 20px;
   text-decoration: none;
-  color: ${props => props.theme.black.medium};
-  font-weight: bolder;
+  color: white;
   &:hover {
     color: ${props => props.theme.black.dark};
   }
   &.active {
-    color: ${props => props.theme.black.dark};
+    color: white;
   }
   transition: color 0.2s ${props => props.theme.transitionTimingFunction};
 `;
@@ -94,7 +93,7 @@ const NavIndicator = styled.div`
   align-self: flex-end;
   width: 100%;
   height: 4px;
-  background: ${props => props.theme.black.dark};
+  background: white;
   transform: ${props => (props.active ? 'scaleY(1)' : 'scaleY(0)')};
   transform-origin: bottom;
   transition: transform 0.3s ${props => props.theme.transitionTimingFunction};
@@ -109,10 +108,10 @@ const Nav = () => {
         <StyledNavLink exact to='/'>
           Home
         </StyledNavLink>
-        <NavIndicator active={location.pathname !== '/favorites'} />
+        <NavIndicator active={location.pathname === '/'} />
       </NavTab>
       <NavTab>
-        <StyledNavLink to='favorites'>Favorites</StyledNavLink>
+        <StyledNavLink to='favorites'>My Theatre</StyledNavLink>
         <NavIndicator active={location.pathname === '/favorites'} />
       </NavTab>
     </StyledNav>
@@ -133,7 +132,6 @@ const StyledForm = styled.form`
   display: flex;
   width: 100%;
   background: rgba(255, 255, 255, 0.7);
-  border-radius: 20px;
 `;
 
 const SearchFormButton = styled.button`
@@ -159,17 +157,30 @@ const SearchInput = styled.input`
 
 const SearchForm = () => {
   const [query, setQuery] = useState('');
-  const dispatch = useDispatch();
+  const { search } = useLocation();
   const history = useHistory();
+  const dispatch = useDispatch();
+  const inputRef = useRef();
+
+  useEffect(() => {
+    if (search) {
+      let query = search.split('=')[1];
+      query = query.split('%20');
+      query = query.join(' ');
+      setQuery(query);
+      dispatch(fetchVideos(query));
+    }
+  }, [search, dispatch]);
 
   const handleSubmit = e => {
     e.preventDefault();
     history.push(`/?search=${query}`);
-    dispatch(fetchRecipes(query));
+    dispatch(fetchVideos(query));
   };
 
   const handleReset = e => {
     setQuery('');
+    inputRef.current.focus();
   };
 
   const handleButtonClick = e => {
@@ -190,9 +201,10 @@ const SearchForm = () => {
           <i className='material-icons'>search</i>
         </SearchFormButton>
         <SearchInput
-          placeholder='Search for recipes...'
+          placeholder='Search for videos...'
           value={query}
           onChange={handleInputChange}
+          ref={inputRef}
         />
         {query && (
           <SearchFormButton type='reset' onMouseDown={handleButtonClick}>

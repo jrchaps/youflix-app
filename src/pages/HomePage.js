@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import styled from 'styled-components/macro';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchVideos } from '../store/actions';
 
 const Image = styled.img`
-  height: 200px;
-  width: 200px;
-  transition: width 0.3s linear, height 0.3s linear, transform 0.3s linear,
-    margin 0.3s linear;
+  height: 11.25vw;
+  width: 25vw;
 `;
 
 const ShowMoreButton = styled.button`
@@ -15,31 +14,49 @@ const ShowMoreButton = styled.button`
 
 const Video = styled.div`
   display: flex;
+  height: 100%;
+  width: 100%;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  border: 1px solid black;
   padding: 10px;
 `;
 
 const Slider = styled.div`
   position: relative;
   display: flex;
-  border: 1px solid black;
-  overflow-x: auto;
+  max-width: ${props => props.width};
+  transform: ${props => `translateX(${props.translateValue})`};
+  transition: ${props =>
+    props.transition
+      ? `transform 0.5s ${props.theme.transitionTimingFunction}`
+      : 'none'};
 `;
 
 const SliderContainer = styled.div`
   position: relative;
   display: flex;
   width: 100%;
-  border: 3px solid pink;
+  border: 1px solid pink;
+  margin-top: 50px;
 `;
 
 const NextButton = styled.button`
   position: absolute;
-  width: 100px;
+  width: 10%;
+  height: 100%;
+  right: 0;
   background: ${props => props.theme.black.medium};
+  border: none;
+`;
+
+const PrevButton = styled.button`
+  position: absolute;
+  width: 10%;
+  height: 100%;
+  z-index: 1;
+  background: ${props => props.theme.black.medium};
+  border: none;
 `;
 
 const MainDiv = styled.div`
@@ -54,33 +71,76 @@ const MainDiv = styled.div`
 `;
 
 const HomePage = () => {
-  const recipes = useSelector(state => state.fetchedRecipes);
+  const [translateValue, setTranslateValue] = useState('0px');
+  const [sliceStart, setSliceStart] = useState(0);
+  const [sliceEnd, setSliceEnd] = useState(4);
+  const [transition, setTransition] = useState(true);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [slice, setSlice] = useState('0, 4');
+  const videos = useSelector(state => state.fetchedVideos);
+  const dispatch = useDispatch();
+  const slider = useRef();
 
-  /*useEffect(() => {
-    fetchVideos();
+  /* useEffect(() => {
+    dispatch(fetchVideos());
   }, []);*/
 
-  const fetchVideos = async () => {
-    const response = await fetch(
-      `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=12&topicId=/m/068hy&type=video&videoEmbeddable=true&key=${process.env.REACT_APP_API_KEY}`
-    );
-    const data = await response.json();
-    //setVideos(data.items);
-    console.log(data.items);
+  useEffect(() => {
+    window.addEventListener('resize', () => {
+      console.log(0.01 * window.innerWidth);
+    });
+  });
+
+  //slider.current.scrollBy(Math.round(0.22 * window.innerWidth) - 100, 0);
+
+  useEffect(() => {}, [videos]);
+
+  const handleNext = () => {
+    setSliceEnd(sliceEnd + 4);
+    setTransition(true);
+    let translateInt = parseInt(translateValue);
+    translateInt -= window.innerWidth;
+    setTranslateValue(`${translateInt}px`);
+    setTimeout(() => {
+      setSliceStart(sliceStart + 4);
+      setTransition(false);
+      setTranslateValue('0px');
+    }, 500);
   };
 
+  const handlePrev = () => {
+    setSliceStart(sliceStart - 4);
+    let translateInt = parseInt(translateValue);
+    translateInt -= window.innerWidth;
+    setTranslateValue(`${translateInt}px`);
+    setTimeout(() => {
+      setTransition(true);
+      setTranslateValue('0px');
+    });
+    setTimeout(() => {
+      setSliceEnd(sliceEnd - 4);
+      setTransition(false);
+    }, 500);
+  };
+
+  //<ShowMoreButton>open</ShowMoreButton>
+  //</Video>
   return (
     <MainDiv>
-      <Slider>
-        <NextButton />
-        {recipes.map((recipe, i) => (
-          <Video>
-            <Image src={recipe.recipe.image}></Image>
-            <ShowMoreButton>open</ShowMoreButton>
-          </Video>
-        ))}
-        <NextButton />
-      </Slider>
+      <SliderContainer>
+        <PrevButton onClick={handlePrev} />
+        <Slider
+          ref={slider}
+          translateValue={translateValue}
+          transition={transition}
+          width={windowWidth}
+        >
+          {videos.slice(sliceStart, sliceEnd).map((video, i) => (
+            <Image src={video.snippet.thumbnails.medium.url}></Image>
+          ))}
+        </Slider>
+        <NextButton onClick={handleNext} />
+      </SliderContainer>
     </MainDiv>
   );
 };

@@ -1,5 +1,5 @@
 import {
-  SET_FETCHED_RECIPES,
+  SET_FETCHED_VIDEOS,
   ADD_FAVORITE,
   REMOVE_FAVORITE,
   NETWORK_ERROR,
@@ -7,9 +7,9 @@ import {
 } from './actions';
 import { combineReducers } from 'redux';
 
-const fetchedRecipesReducer = (state = [], action) => {
+const fetchedVideosReducer = (state = [], action) => {
   switch (action.type) {
-    case SET_FETCHED_RECIPES:
+    case SET_FETCHED_VIDEOS:
       return action.results;
     default:
       return state;
@@ -46,7 +46,7 @@ const isFetchingReducer = (state = false, action) => {
 };
 
 export const allReducers = combineReducers({
-  fetchedRecipes: fetchedRecipesReducer,
+  fetchedVideos: fetchedVideosReducer,
   favorites: favoritesReducer,
   networkError: networkErrorReducer,
   isFetching: isFetchingReducer,

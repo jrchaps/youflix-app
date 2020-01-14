@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
+import normalize from 'normalize.css';
 import { ThemeProvider } from 'styled-components/macro';
 import * as serviceWorker from './serviceWorker';
 import { allReducers } from './store/reducers';
@@ -10,30 +11,31 @@ import thunkMiddleware from 'redux-thunk';
 import { createGlobalStyle } from 'styled-components/macro';
 
 const theme = {
-  bodyBackground: 'black',
+  bodyBackground: '#fafafa',
   fontFamily: 'Roboto',
   black: {
     dark: 'rgba(0, 0, 0, 0.87)',
     medium: 'rgba(0, 0, 0, 0.6)',
-    light: 'rgba(0, 0, 0, 0.38)'
+    light: 'rgba(0, 0, 0, 0.38)',
   },
   color: {
     primary: {
-      main: '#ffcc80',
-      dark: '#ca9b52'
+      main: '#263238',
+      dark: '#000a12',
     },
     secondary: {
-      main: '#ff8a65'
-    }
+      main: '#424242',
+    },
   },
   transitionTimingFunction: 'cubic-bezier(0.4, 0.0, 0.2, 1)',
-  shadow: '0px 1px 3px 1px rgba(0, 0, 0, 0.2)'
+  shadow: '0px 1px 3px 1px rgba(0, 0, 0, 0.2)',
 };
 
 const GlobalStyle = createGlobalStyle`
  body {
   background: ${props => props.theme.bodyBackground};
   font-family: ${props => props.theme.fontFamily};
+  overflow-x: hidden;
 }
 `;
 
@@ -43,8 +45,8 @@ const store = createStore(
     applyMiddleware(thunkMiddleware),
     window.__REDUX_DEVTOOLS_EXTENSION__
       ? window.__REDUX_DEVTOOLS_EXTENSION__()
-      : f => f
-  )
+      : f => f,
+  ),
 );
 
 ReactDOM.render(
@@ -54,7 +56,7 @@ ReactDOM.render(
       <App />
     </ThemeProvider>
   </Provider>,
-  document.getElementById('root')
+  document.getElementById('root'),
 );
 
 // If you want your app to work offline and load faster, you can change
