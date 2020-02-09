@@ -11,8 +11,8 @@ const HeaderBar = styled.header`
   width: 100%;
   padding: 0px 50px;
   box-sizing: border-box;
-  z-index: 1;
-  background: ${props => props.theme.color.primary.main};
+  z-index: 2;
+  background: ${props => props.theme.color.primary.dark};
   box-shadow: ${props => props.theme.shadow};
   transform: ${props =>
     props.isHidden ? 'translateY(-70px)' : 'translateY(0)'};
@@ -28,20 +28,8 @@ const HeaderBar = styled.header`
 `;
 
 const Header = () => {
-  const [scrollPos, setScrollPos] = useState(0);
-  const [isHeaderHidden, setIsHeaderHidden] = useState(false);
-
-  useEffect(() => {
-    window.onscroll = () => {
-      document.documentElement.scrollTop > scrollPos
-        ? setIsHeaderHidden(true)
-        : setIsHeaderHidden(false);
-      setScrollPos(document.documentElement.scrollTop);
-    };
-  });
-
   return (
-    <HeaderBar isHidden={isHeaderHidden}>
+    <HeaderBar>
       <Nav />
       <SearchForm />
     </HeaderBar>
@@ -54,6 +42,7 @@ const StyledNav = styled.nav`
   display: flex;
   flex-grow: 1;
   @media (max-width: 768px) {
+    justify-content: center;
     height: 56px;
     order: 1;
   }
@@ -65,8 +54,7 @@ const NavTab = styled.div`
   align-items: center;
   margin-right: 30px;
   @media (max-width: 768px) {
-    flex-grow: 1;
-    margin: 0px;
+    margin: 0px auto;
   }
 `;
 
@@ -78,12 +66,12 @@ const StyledNavLink = styled(NavLink)`
   width: 100%;
   padding: 0px 20px;
   text-decoration: none;
-  color: white;
+  color: ${props => props.theme.white.light};
   &:hover {
-    color: ${props => props.theme.black.dark};
+    color: ${props => props.theme.white.medium};
   }
   &.active {
-    color: white;
+    color: ${props => props.theme.white.light};
   }
   transition: color 0.2s ${props => props.theme.transitionTimingFunction};
 `;
@@ -93,7 +81,7 @@ const NavIndicator = styled.div`
   align-self: flex-end;
   width: 100%;
   height: 4px;
-  background: white;
+  background: ${props => props.theme.white.light};
   transform: ${props => (props.active ? 'scaleY(1)' : 'scaleY(0)')};
   transform-origin: bottom;
   transition: transform 0.3s ${props => props.theme.transitionTimingFunction};
@@ -131,7 +119,8 @@ const SearchFormContainer = styled.div`
 const StyledForm = styled.form`
   display: flex;
   width: 100%;
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid ${props => props.theme.white.medium};
 `;
 
 const SearchFormButton = styled.button`
@@ -140,19 +129,20 @@ const SearchFormButton = styled.button`
   user-select: none;
   background: none;
   border: none;
-  color: ${props => props.theme.black.medium};
+  color: ${props => props.theme.white.light};
   &:hover {
-    color: ${props => props.theme.black.dark};
+    color: ${props => props.theme.white.medium};
   }
 `;
 
 const SearchInput = styled.input`
   width: 100%;
   padding: 8px;
+  user-select: none;
   outline: none;
   background: none;
   border: none;
-  color: ${props => props.theme.black.dark};
+  color: ${props => props.theme.white.light};
 `;
 
 const SearchForm = () => {

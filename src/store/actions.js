@@ -1,7 +1,8 @@
 export const SET_FETCHED_VIDEOS = 'SET_FETCHED_VIDEOS';
-export const setFetchedVideos = results => {
+export const setFetchedVideos = (topic, results) => {
   return {
     type: SET_FETCHED_VIDEOS,
+    topic,
     results,
   };
 };
@@ -39,17 +40,16 @@ export const isFetching = boolean => {
   };
 };
 
-export const fetchVideos = () => {
+export const fetchVideos = (topic, topicId) => {
   return async dispatch => {
     dispatch(networkError(false));
     dispatch(isFetching(true));
     try {
       const response = await fetch(
-        `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=12&topicId=/m/068hy&type=video&videoEmbeddable=true&key=${process.env.REACT_APP_API_KEY}`,
+        `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=12&topicId=${topicId}&type=video&videoEmbeddable=true&key=${process.env.REACT_APP_API_KEY}`,
       );
       const data = await response.json();
-      console.log(data.items);
-      dispatch(setFetchedVideos(data.items));
+      dispatch(setFetchedVideos(topic, data.items));
       dispatch(isFetching(false));
     } catch (error) {
       dispatch(isFetching(false));

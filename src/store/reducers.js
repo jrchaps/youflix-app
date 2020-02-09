@@ -7,10 +7,10 @@ import {
 } from './actions';
 import { combineReducers } from 'redux';
 
-const fetchedVideosReducer = (state = [], action) => {
+const fetchedVideosReducer = (state = {}, action) => {
   switch (action.type) {
     case SET_FETCHED_VIDEOS:
-      return action.results;
+      return { ...state, [action.topic]: action.results };
     default:
       return state;
   }

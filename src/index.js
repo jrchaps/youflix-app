@@ -11,20 +11,28 @@ import thunkMiddleware from 'redux-thunk';
 import { createGlobalStyle } from 'styled-components/macro';
 
 const theme = {
-  bodyBackground: '#fafafa',
+  bodyBackground: '#1b1b1b',
   fontFamily: 'Roboto',
   black: {
     dark: 'rgba(0, 0, 0, 0.87)',
     medium: 'rgba(0, 0, 0, 0.6)',
     light: 'rgba(0, 0, 0, 0.38)',
   },
+  white: {
+    dark: 'rgba(255, 255, 255, 0.38)',
+    medium: 'rgba(255, 255, 255, 0.6)',
+    light: 'rgba(255, 255, 255, 0.87)',
+  },
   color: {
     primary: {
-      main: '#263238',
-      dark: '#000a12',
+      main: '#424242',
+      dark: '#1b1b1b',
+      light: '#6d6d6d',
     },
     secondary: {
-      main: '#424242',
+      main: '#d32f2f',
+      dark: '#9a0007',
+      light: '#ff6659',
     },
   },
   transitionTimingFunction: 'cubic-bezier(0.4, 0.0, 0.2, 1)',
