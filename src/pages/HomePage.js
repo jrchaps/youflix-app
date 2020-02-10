@@ -10,15 +10,13 @@ const MainDiv = styled.div`
   flex-wrap: wrap;
   justify-content: center;
   align-items: flex-start;
+  height: calc(100vh - 64px);
+  @media (max-width: 768px) {
+    height: calc(100vh - 104px);
+  }
   padding-top: 64px;
   @media (max-width: 768px) {
     padding-top: 104px;
-  }
-  &:nth-last-child(1) {
-    margin-bottom: 60px;
-    @media (min-width: 1400px) {
-      margin-bottom: 120px;
-    }
   }
 `;
 
@@ -28,7 +26,7 @@ const HomePage = () => {
     Music: '/m/04rlf',
     Gaming: '/m/0bzvm2',
     Food: '/m/02wbm',
-    Technology: '/m/07c1v',
+    Technology: '/m/07c1v'
   };
 
   /*useEffect(() => {
@@ -38,14 +36,16 @@ const HomePage = () => {
     });
   }, []);*/
 
-  /*{Object.keys(topics).map(topic => (
+  return (
+    <MainDiv>
+      {Object.keys(topics).map(topic => (
         <SliderComponent topic={topic} />
       ))}
       {Object.keys(topics).map(topic => (
         <SliderComponent topic={topic} />
-      ))}*/
-
-  return <Player></Player>;
+      ))}
+    </MainDiv>
+  );
 };
 
 export default HomePage;

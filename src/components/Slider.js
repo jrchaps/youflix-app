@@ -43,6 +43,12 @@ const ButtonContainer = styled.div`
   justify-content: space-between;
   width: 100%;
   margin-top: 5px;
+  &:nth-last-child(1) {
+    margin-bottom: 60px;
+    @media (min-width: 1400px) {
+      margin-bottom: 120px;
+    }
+  }
 `;
 
 const SliderButton = styled.button`
@@ -174,7 +180,7 @@ const SliderComponent = props => {
   const [translateValue, setTranslateValue] = useState(0);
   const [sliderClassName, setSliderClassName] = useState('');
   const [indicatorClassName, setIndicatorClassName] = useState(
-    'material-icons',
+    'material-icons'
   );
 
   const firstClick = useRef(true);
@@ -197,6 +203,12 @@ const SliderComponent = props => {
   });
 
   useEffect(() => {
+    setItemWidth(
+      sliderContainerRef.current.clientWidth / itemsPerSlide.current
+    );
+  });
+
+  useEffect(() => {
     const handleResize = () => {
       setItemsPerSlide();
     };
@@ -204,12 +216,6 @@ const SliderComponent = props => {
     return () => {
       window.removeEventListener('resize', handleResize);
     };
-  });
-
-  useEffect(() => {
-    setItemWidth(
-      sliderContainerRef.current.clientWidth / itemsPerSlide.current,
-    );
   });
 
   const setItemsPerSlide = () => {
@@ -231,7 +237,7 @@ const SliderComponent = props => {
       itemsPerSlide.current = 6;
     }
     totalSlides.current = Array(
-      Math.ceil(items.length / itemsPerSlide.current),
+      Math.ceil(items.length / itemsPerSlide.current)
     ).fill('');
     if (totalSlides.current[currentSlide.current] === undefined) {
       currentSlide.current = totalSlides.current.length - 1;
@@ -254,7 +260,7 @@ const SliderComponent = props => {
     } else {
       shownItems.current = list.slice(
         list.indexOf(shownItems.current[0]),
-        list.indexOf(shownItems.current[0]) + itemsPerSlide.current + 2,
+        list.indexOf(shownItems.current[0]) + itemsPerSlide.current + 2
       );
       if (buttonVisibility.current === 'hidden') {
         buttonVisibility.current = 'visible';
@@ -267,11 +273,11 @@ const SliderComponent = props => {
 
   const buildNewList = () => {
     let itemsIndex = items.indexOf(
-      shownItems.current[shownItems.current.length - 1],
+      shownItems.current[shownItems.current.length - 1]
     );
     let itemsSlice = items.slice(
       itemsIndex + 1,
-      itemsIndex + 1 + itemsPerSlide.current,
+      itemsIndex + 1 + itemsPerSlide.current
     );
     let firstItem = items.slice(0, 1);
     let lastItem = items.slice(-1);
@@ -297,24 +303,24 @@ const SliderComponent = props => {
       setTranslateValue(
         -1 *
           translatePerItem *
-          (newList.slice(0, newList.indexOf(shownItems.current[0])).length + 1),
+          (newList.slice(0, newList.indexOf(shownItems.current[0])).length + 1)
       );
     }
   };
 
   const handleNext = () => {
     let numOfItemsToTranslate = list.slice(
-      list.lastIndexOf(shownItems.current[shownItems.current.length - 1]) + 1,
+      list.lastIndexOf(shownItems.current[shownItems.current.length - 1]) + 1
     ).length;
     if (firstClick.current) {
       shownItems.current = list.slice(
         list.indexOf(shownItems.current[0]) + numOfItemsToTranslate - 1,
-        list.length,
+        list.length
       );
     } else {
       shownItems.current = list.slice(
         list.indexOf(shownItems.current[0]) + numOfItemsToTranslate,
-        list.length,
+        list.length
       );
     }
     pointerEvents.current = 'none';
@@ -322,7 +328,7 @@ const SliderComponent = props => {
     transition.current = true;
     let translatePerItem = 100 / list.length;
     setTranslateValue(
-      translateValue - translatePerItem * numOfItemsToTranslate,
+      translateValue - translatePerItem * numOfItemsToTranslate
     );
     setTimeout(() => {
       currentSlide.current === totalSlides.current.length - 1
@@ -341,20 +347,20 @@ const SliderComponent = props => {
   const handleBack = () => {
     let numOfItemsToTranslate = list.slice(
       0,
-      list.indexOf(shownItems.current[0]),
+      list.indexOf(shownItems.current[0])
     ).length;
     shownItems.current = list.slice(
       list.indexOf(shownItems.current[0]) - numOfItemsToTranslate,
       list.lastIndexOf(shownItems.current[shownItems.current.length - 1]) -
         numOfItemsToTranslate +
-        1,
+        1
     );
     pointerEvents.current = 'none';
     buttonDisabled.current = true;
     transition.current = true;
     let translatePerItem = 100 / list.length;
     setTranslateValue(
-      translateValue + translatePerItem * numOfItemsToTranslate,
+      translateValue + translatePerItem * numOfItemsToTranslate
     );
     setTimeout(() => {
       currentSlide.current === 0
@@ -463,7 +469,7 @@ const SliderComponent = props => {
                     >
                       <Image src={item.snippet.thumbnails.medium.url} />
                     </Item>
-                  ),
+                  )
                 )
               : list.map((item, i) =>
                   i === list.indexOf(shownItems.current[0]) + 1 ? (
@@ -497,7 +503,7 @@ const SliderComponent = props => {
                     >
                       <Image src={item.snippet.thumbnails.medium.url} />
                     </Item>
-                  ),
+                  )
                 )}
           </Slider>
         </SliderContainer>

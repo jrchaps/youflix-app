@@ -6,6 +6,10 @@ const MainDiv = styled.div`
   flex-wrap: wrap;
   justify-content: center;
   align-items: flex-start;
+  height: calc(100vh - 64px);
+  @media (max-width: 768px) {
+    height: calc(100vh - 104px);
+  }
   padding-top: 64px;
   @media (max-width: 768px) {
     padding-top: 104px;
@@ -13,48 +17,19 @@ const MainDiv = styled.div`
 `;
 
 const Iframe = styled.iframe`
-  width: 640px;
-  height: 390px;
+  width: 50%;
+  height: 55%;
+  margin: auto;
   border: none;
 `;
 
 const Player = () => {
-  /*useEffect(() => {
-    let tag = document.createElement('script');
-    tag.src = 'https://www.youtube.com/iframe_api';
-    tag.async = true;
-    document.body.appendChild(tag);
-
-    return () => {
-      document.body.removeChild(tag);
-    };
-  }, []);*/
-
-  /*const onYouTubeIframeAPIReady = () => {
-    let player = new YT.Player('player', {
-      events: {
-        onReady: onPlayerReady,
-        //onStateChange: onPlayerStateChange,
-      },
-    });
-  };*/
-
-  function onPlayerReady(event) {
-    event.target.playVideo();
-  }
-
   return (
-    <MainDiv>
-      <Iframe
-        src='http://www.youtube.com/embed/M7lc1UVf-VE?enablejsapi=1&autoplay=1'
-        allowFullScreen
-      ></Iframe>
-    </MainDiv>
+    <Iframe
+      src='http://www.youtube.com/embed/M7lc1UVf-VE?enablejsapi=1&autoplay=1'
+      allowFullScreen
+    ></Iframe>
   );
 };
 
 export default Player;
-
-const VideoPlayer = () => {
-  return <MainDiv></MainDiv>;
-};
