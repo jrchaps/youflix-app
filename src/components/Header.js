@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
-import { fetchVideos } from '../store/actions';
+import { fetchSearchedVideos } from '../store/actions';
 import styled from 'styled-components/macro';
 import { useHistory, useLocation, NavLink } from 'react-router-dom';
 
@@ -99,8 +99,8 @@ const Nav = () => {
         <NavIndicator active={location.pathname === '/'} />
       </NavTab>
       <NavTab>
-        <StyledNavLink to='favorites'>My Theatre</StyledNavLink>
-        <NavIndicator active={location.pathname === '/favorites'} />
+        <StyledNavLink to='library'>My Library</StyledNavLink>
+        <NavIndicator active={location.pathname === '/library'} />
       </NavTab>
     </StyledNav>
   );
@@ -158,14 +158,13 @@ const SearchForm = () => {
       query = query.split('%20');
       query = query.join(' ');
       setQuery(query);
-      dispatch(fetchVideos(query));
+      dispatch(fetchSearchedVideos(query));
     }
   }, [search, dispatch]);
 
   const handleSubmit = e => {
     e.preventDefault();
-    history.push(`/?search=${query}`);
-    dispatch(fetchVideos(query));
+    dispatch(fetchSearchedVideos(query, history));
   };
 
   const handleReset = e => {

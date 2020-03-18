@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import styled from 'styled-components/macro';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import Item from './Item';
 
 const SliderHeaderContainer = styled.div`
   display: flex;
@@ -35,12 +36,12 @@ const SlideIndicator = styled.i`
   &.shown {
     opacity: 1;
   }
+  user-select: none;
 `;
 
 const ButtonContainer = styled.div`
   position: relative;
   display: flex;
-  justify-content: space-between;
   width: 100%;
   margin-top: 5px;
   &:nth-last-child(1) {
@@ -52,15 +53,16 @@ const ButtonContainer = styled.div`
 `;
 
 const SliderButton = styled.button`
-  width: 5%;
+  width: 7%;
+  @media (min-width: 800px) {
+    width: 5%;
+  }
   @media (min-width: 1400px) {
     width: 4%;
   }
-  @media (max-width: 800px) {
-    width: 7%;
-  }
   z-index: 1;
   user-select: none;
+  pointer-events: ${props => props.pointerEvents};
   visibility: ${props => props.visibility};
   background: ${props => props.theme.black.medium};
   border: none;
@@ -69,11 +71,14 @@ const SliderButton = styled.button`
   }
 `;
 
-const ButtonIcon = styled.i`
+const SliderButtonIcon = styled.i`
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 48px;
+  font-size: 18px;
+  @media (min-width: 425px) {
+    font-size: 48px;
+  }
   @media (min-width: 2560px) {
     font-size: 60px;
   }
@@ -82,73 +87,22 @@ const ButtonIcon = styled.i`
   ${ButtonContainer}:hover & {
     opacity: 1;
   }
-  ${SliderButton}:hover & {
-    font-size: 60px;
-    @media (min-width: 2560px) {
-      font-size: 72px;
-    }
-  }
 `;
 
 const SliderContainer = styled.div`
   position: relative;
   display: flex;
-  width: 90%;
+  width: 86%;
+  @media (min-width: 800px) {
+    width: 90%;
+  }
   @media (min-width: 1400px) {
     width: 92%;
-  }
-  @media (max-width: 800px) {
-    width: 86%;
   }
   user-select: none;
 `;
 
-const ItemBase = styled.button`
-  display: flex;
-  height: ${props => `calc(${props.width}px / 1.778)`};
-  width: ${props => `${props.width}px`};
-  padding: 0px 2px;
-  cursor: pointer;
-  border: none;
-  background: ${props => props.theme.color.primary.dark};
-  &.slide.item:hover {
-    transform: scale(1.5);
-  }
-  transition: transform 0.5s ${props => props.transitionTimingFunction} 0.2s;
-`;
-
-const Image = styled.img`
-  height: 100%;
-  width: 100%;
-`;
-
-const RightItem = styled(ItemBase)`
-  transform-origin: right;
-  &.slide.item:hover ~ .normal-item {
-    transform: translateX(0);
-  }
-`;
-
-const Item = styled(ItemBase)`
-  &.slide.item:hover ~ & {
-    transform: translateX(25%);
-  }
-  &.slide.item:hover ~ ${RightItem} {
-    transform: translateX(25%);
-  }
-`;
-
-const LeftItem = styled(ItemBase)`
-  transform-origin: left;
-  &.slide.item:hover ~ ${Item} {
-    transform: translateX(50%);
-  }
-  &.slide.item:hover ~ ${RightItem} {
-    transform: translateX(50%);
-  }
-`;
-
-const Slider = styled.div`
+const StyledSlider = styled.div`
   position: relative;
   display: flex;
   transform: ${props => `translateX(${props.translateValue}%)`};
@@ -157,30 +111,30 @@ const Slider = styled.div`
       ? `transform 0.8s ${props.theme.transitionTimingFunction}`
       : 'none'};
   pointer-events: ${props => props.pointerEvents};
-  &:hover ${Item} {
+  &:hover .middle-item {
     transform: translateX(-25%);
   }
-  &:hover ${LeftItem} {
+  &:hover .left-item {
     transform: translateX(-25%);
   }
-  &.first-item-hovered:hover ${Item} {
+  &.left-item-hovered:hover .middle-item {
     transform: translateX(0);
   }
-  &.last-item-hovered:hover ${Item} {
+  &.right-item-hovered:hover .middle-item {
     transform: translateX(-50%);
   }
-  &.last-item-hovered:hover ${LeftItem} {
+  &.right-item-hovered:hover .left-item {
     transform: translateX(-50%);
   }
 `;
 
-const SliderComponent = props => {
-  const items = useSelector(state => state.fetchedVideos[props.topic]);
+const Slider = props => {
+  const items = useSelector(state => state.fetchedHomeVideos[props.index]);
   const [list, setList] = useState([]);
   const [translateValue, setTranslateValue] = useState(0);
   const [sliderClassName, setSliderClassName] = useState('');
   const [indicatorClassName, setIndicatorClassName] = useState(
-    'material-icons'
+    'material-icons',
   );
 
   const firstClick = useRef(true);
@@ -193,19 +147,12 @@ const SliderComponent = props => {
   const [itemWidth, setItemWidth] = useState();
   const transition = useRef(false);
   const pointerEvents = useRef('auto');
-  const buttonDisabled = useRef(false);
   const buttonVisibility = useRef('visible');
 
   useEffect(() => {
     if (list.length === 0 && items) {
       setItemsPerSlide();
     }
-  });
-
-  useEffect(() => {
-    setItemWidth(
-      sliderContainerRef.current.clientWidth / itemsPerSlide.current
-    );
   });
 
   useEffect(() => {
@@ -219,17 +166,17 @@ const SliderComponent = props => {
   });
 
   const setItemsPerSlide = () => {
-    if (window.innerWidth <= 800 && itemsPerSlide.current !== 3) {
+    if (window.innerWidth < 800 && itemsPerSlide.current !== 3) {
       itemsPerSlide.current = 3;
     } else if (
+      window.innerWidth >= 800 &&
       window.innerWidth < 1100 &&
-      window.innerWidth > 800 &&
       itemsPerSlide.current !== 4
     ) {
       itemsPerSlide.current = 4;
     } else if (
+      window.innerWidth >= 1100 &&
       window.innerWidth < 1400 &&
-      window.innerWidth > 1100 &&
       itemsPerSlide.current !== 5
     ) {
       itemsPerSlide.current = 5;
@@ -237,11 +184,14 @@ const SliderComponent = props => {
       itemsPerSlide.current = 6;
     }
     totalSlides.current = Array(
-      Math.ceil(items.length / itemsPerSlide.current)
+      Math.ceil(items.length / itemsPerSlide.current),
     ).fill('');
     if (totalSlides.current[currentSlide.current] === undefined) {
       currentSlide.current = totalSlides.current.length - 1;
     }
+    setItemWidth(
+      sliderContainerRef.current.clientWidth / itemsPerSlide.current,
+    );
     buildInitialList();
   };
 
@@ -260,7 +210,7 @@ const SliderComponent = props => {
     } else {
       shownItems.current = list.slice(
         list.indexOf(shownItems.current[0]),
-        list.indexOf(shownItems.current[0]) + itemsPerSlide.current + 2
+        list.indexOf(shownItems.current[0]) + itemsPerSlide.current + 2,
       );
       if (buttonVisibility.current === 'hidden') {
         buttonVisibility.current = 'visible';
@@ -273,11 +223,11 @@ const SliderComponent = props => {
 
   const buildNewList = () => {
     let itemsIndex = items.indexOf(
-      shownItems.current[shownItems.current.length - 1]
+      shownItems.current[shownItems.current.length - 1],
     );
     let itemsSlice = items.slice(
       itemsIndex + 1,
-      itemsIndex + 1 + itemsPerSlide.current
+      itemsIndex + 1 + itemsPerSlide.current,
     );
     let firstItem = items.slice(0, 1);
     let lastItem = items.slice(-1);
@@ -303,32 +253,31 @@ const SliderComponent = props => {
       setTranslateValue(
         -1 *
           translatePerItem *
-          (newList.slice(0, newList.indexOf(shownItems.current[0])).length + 1)
+          (newList.slice(0, newList.indexOf(shownItems.current[0])).length + 1),
       );
     }
   };
 
   const handleNext = () => {
     let numOfItemsToTranslate = list.slice(
-      list.lastIndexOf(shownItems.current[shownItems.current.length - 1]) + 1
+      list.lastIndexOf(shownItems.current[shownItems.current.length - 1]) + 1,
     ).length;
     if (firstClick.current) {
       shownItems.current = list.slice(
         list.indexOf(shownItems.current[0]) + numOfItemsToTranslate - 1,
-        list.length
+        list.length,
       );
     } else {
       shownItems.current = list.slice(
         list.indexOf(shownItems.current[0]) + numOfItemsToTranslate,
-        list.length
+        list.length,
       );
     }
     pointerEvents.current = 'none';
-    buttonDisabled.current = true;
     transition.current = true;
     let translatePerItem = 100 / list.length;
     setTranslateValue(
-      translateValue - translatePerItem * numOfItemsToTranslate
+      translateValue - translatePerItem * numOfItemsToTranslate,
     );
     setTimeout(() => {
       currentSlide.current === totalSlides.current.length - 1
@@ -338,7 +287,6 @@ const SliderComponent = props => {
         firstClick.current = false;
       }
       pointerEvents.current = 'auto';
-      buttonDisabled.current = false;
       transition.current = false;
       buildNewList();
     }, 800);
@@ -347,27 +295,25 @@ const SliderComponent = props => {
   const handleBack = () => {
     let numOfItemsToTranslate = list.slice(
       0,
-      list.indexOf(shownItems.current[0])
+      list.indexOf(shownItems.current[0]),
     ).length;
     shownItems.current = list.slice(
       list.indexOf(shownItems.current[0]) - numOfItemsToTranslate,
       list.lastIndexOf(shownItems.current[shownItems.current.length - 1]) -
         numOfItemsToTranslate +
-        1
+        1,
     );
     pointerEvents.current = 'none';
-    buttonDisabled.current = true;
     transition.current = true;
     let translatePerItem = 100 / list.length;
     setTranslateValue(
-      translateValue + translatePerItem * numOfItemsToTranslate
+      translateValue + translatePerItem * numOfItemsToTranslate,
     );
     setTimeout(() => {
       currentSlide.current === 0
         ? (currentSlide.current = totalSlides.current.length - 1)
         : (currentSlide.current = currentSlide.current - 1);
       pointerEvents.current = 'auto';
-      buttonDisabled.current = false;
       transition.current = false;
       buildNewList();
     }, 800);
@@ -385,141 +331,130 @@ const SliderComponent = props => {
     setIndicatorClassName('material-icons');
   };
 
-  const handleFirstItemMouseOver = () => {
-    setSliderClassName('first-item-hovered');
+  const handleLeftItemMouseOver = () => {
+    setSliderClassName('left-item-hovered');
   };
 
-  const handleLastItemMouseOver = () => {
-    setSliderClassName('last-item-hovered');
+  const handleRightItemMouseOver = () => {
+    setSliderClassName('right-item-hovered');
   };
+
   const handleItemMouseOut = () => {
     setSliderClassName('');
   };
 
   return (
     <React.Fragment>
-      <SliderHeaderContainer>
-        <SliderHeader>{props.topic}</SliderHeader>
-        {totalSlides.current.length > 1 &&
-          totalSlides.current.map((item, i) => (
-            <SlideIndicator
-              className={indicatorClassName}
-              active={i === currentSlide.current}
-              key={i}
-            >
-              remove
-            </SlideIndicator>
-          ))}
-      </SliderHeaderContainer>
+      {list.length > 0 && (
+        <SliderHeaderContainer>
+          <SliderHeader>{props.topic}</SliderHeader>
+          {totalSlides.current.length > 1 &&
+            totalSlides.current.map((item, i) => (
+              <SlideIndicator
+                className={indicatorClassName}
+                active={i === currentSlide.current}
+                key={i}
+              >
+                remove
+              </SlideIndicator>
+            ))}
+        </SliderHeaderContainer>
+      )}
       <ButtonContainer
         onMouseOver={handleButtonContainerMouseOver}
         onMouseOut={handleButtonContainerMouseOut}
       >
-        <SliderButton
-          onClick={handleBack}
-          onMouseDown={handleButtonMouseDown}
-          disabled={buttonDisabled.current}
-          visibility={
-            firstClick.current || buttonVisibility.current === 'hidden'
-              ? 'hidden'
-              : 'visible'
-          }
-        >
-          <ButtonIcon className='material-icons'>
-            keyboard_arrow_left
-          </ButtonIcon>
-        </SliderButton>
+        {list.length > 0 && (
+          <SliderButton
+            onClick={handleBack}
+            onMouseDown={handleButtonMouseDown}
+            pointerEvents={pointerEvents.current}
+            visibility={
+              firstClick.current || buttonVisibility.current === 'hidden'
+                ? 'hidden'
+                : 'visible'
+            }
+          >
+            <SliderButtonIcon className='material-icons'>
+              keyboard_arrow_left
+            </SliderButtonIcon>
+          </SliderButton>
+        )}
         <SliderContainer ref={sliderContainerRef}>
-          <Slider
+          <StyledSlider
             translateValue={translateValue}
             transition={transition.current}
             pointerEvents={pointerEvents.current}
             className={sliderClassName}
           >
             {buttonVisibility.current === 'hidden' || firstClick.current
-              ? list.map((item, i) =>
-                  i === 0 ? (
-                    <LeftItem
-                      width={itemWidth}
-                      onMouseOver={handleFirstItemMouseOver}
-                      onMouseOut={handleItemMouseOut}
-                      className='slide item'
-                      key={i}
-                    >
-                      <Image src={item.snippet.thumbnails.medium.url} />
-                    </LeftItem>
-                  ) : i ===
-                    list.indexOf(shownItems.current[0]) +
-                      itemsPerSlide.current -
-                      1 ? (
-                    <RightItem
-                      width={itemWidth}
-                      onMouseOver={handleLastItemMouseOver}
-                      onMouseOut={handleItemMouseOut}
-                      className='slide item'
-                      key={i}
-                    >
-                      <Image src={item.snippet.thumbnails.medium.url} />
-                    </RightItem>
-                  ) : (
-                    <Item
-                      width={itemWidth}
-                      className='slide item normal-item'
-                      key={i}
-                    >
-                      <Image src={item.snippet.thumbnails.medium.url} />
-                    </Item>
-                  )
-                )
-              : list.map((item, i) =>
-                  i === list.indexOf(shownItems.current[0]) + 1 ? (
-                    <LeftItem
-                      width={itemWidth}
-                      onMouseOver={handleFirstItemMouseOver}
-                      onMouseOut={handleItemMouseOut}
-                      className='slide item'
-                      key={i}
-                    >
-                      <Image src={item.snippet.thumbnails.medium.url} />
-                    </LeftItem>
-                  ) : i ===
-                    list.indexOf(shownItems.current[0]) +
-                      itemsPerSlide.current ? (
-                    <RightItem
-                      width={itemWidth}
-                      onMouseOver={handleLastItemMouseOver}
-                      onMouseOut={handleItemMouseOut}
-                      className='slide item'
-                      key={i}
-                    >
-                      <Image src={item.snippet.thumbnails.medium.url} />
-                    </RightItem>
-                  ) : (
-                    <Item
-                      width={itemWidth}
-                      className='slide item normal-item'
-                      firstShownItem={i === list.indexOf(shownItems.current[0])}
-                      key={i}
-                    >
-                      <Image src={item.snippet.thumbnails.medium.url} />
-                    </Item>
-                  )
-                )}
-          </Slider>
+              ? list.map((item, i) => (
+                  <Item
+                    type={
+                      i === 0
+                        ? 'left'
+                        : i ===
+                          list.indexOf(shownItems.current[0]) +
+                            itemsPerSlide.current -
+                            1
+                        ? 'right'
+                        : 'middle'
+                    }
+                    hasKeyboardNavigation={shownItems.current.some(
+                      (shownItem, index) =>
+                        shownItem === item &&
+                        index !== shownItems.current.length - 1,
+                    )}
+                    handleRightItemMouseOver={handleRightItemMouseOver}
+                    handleLeftItemMouseOver={handleLeftItemMouseOver}
+                    handleItemMouseOut={handleItemMouseOut}
+                    item={item}
+                    width={itemWidth}
+                    key={i}
+                  ></Item>
+                ))
+              : list.map((item, i) => (
+                  <Item
+                    type={
+                      i === list.indexOf(shownItems.current[0]) + 1
+                        ? 'left'
+                        : i ===
+                          list.indexOf(shownItems.current[0]) +
+                            itemsPerSlide.current
+                        ? 'right'
+                        : 'middle'
+                    }
+                    hasKeyboardNavigation={shownItems.current.some(
+                      (shownItem, index) =>
+                        shownItem === item &&
+                        index !== 0 &&
+                        index !== shownItems.current.length - 1,
+                    )}
+                    handleRightItemMouseOver={handleRightItemMouseOver}
+                    handleLeftItemMouseOver={handleLeftItemMouseOver}
+                    handleItemMouseOut={handleItemMouseOut}
+                    item={item}
+                    width={itemWidth}
+                    key={i}
+                  ></Item>
+                ))}
+          </StyledSlider>
         </SliderContainer>
-        <SliderButton
-          onClick={handleNext}
-          onMouseDown={handleButtonMouseDown}
-          disabled={buttonDisabled.current}
-          visibility={buttonVisibility.current}
-        >
-          <ButtonIcon className='material-icons'>
-            keyboard_arrow_right
-          </ButtonIcon>
-        </SliderButton>
+        {list.length > 0 && (
+          <SliderButton
+            onClick={handleNext}
+            onMouseDown={handleButtonMouseDown}
+            pointerEvents={pointerEvents.current}
+            visibility={buttonVisibility.current}
+          >
+            <SliderButtonIcon className='material-icons'>
+              keyboard_arrow_right
+            </SliderButtonIcon>
+          </SliderButton>
+        )}
       </ButtonContainer>
     </React.Fragment>
   );
 };
 
-export default SliderComponent;
+export default Slider;

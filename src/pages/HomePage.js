@@ -1,14 +1,13 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
-import { useDispatch } from 'react-redux';
-import { fetchVideos } from '../store/actions';
-import SliderComponent from '../components/Slider';
-import Player from './VideoPlayerPage';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchHomeVideos } from '../store/actions';
+import Slider from '../components/Slider';
+import LoadingBar from '../components/LoadingBar';
 
 const MainDiv = styled.div`
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
   align-items: flex-start;
   height: calc(100vh - 64px);
   @media (max-width: 768px) {
@@ -18,31 +17,29 @@ const MainDiv = styled.div`
   @media (max-width: 768px) {
     padding-top: 104px;
   }
+  margin-bottom: 10px;
 `;
 
-const HomePage = () => {
-  const dispatch = useDispatch();
-  let topics = {
-    Music: '/m/04rlf',
-    Gaming: '/m/0bzvm2',
-    Food: '/m/02wbm',
-    Technology: '/m/07c1v'
-  };
+let topics = {
+  Music: '/m/04rlf',
+  Gaming: '/m/0bzvm2',
+  Food: '/m/02wbm',
+  Technology: '/m/07c1v',
+};
 
-  /*useEffect(() => {
-    Object.keys(topics).forEach(topic => {
-      console.log(topics[topic]);
-      dispatch(fetchVideos(topic, topics[topic]));
-    });
-  }, []);*/
+const HomePage = () => {
+  const isFetching = useSelector(state => state.isFetching);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchHomeVideos(topics));
+  }, []);
 
   return (
     <MainDiv>
-      {Object.keys(topics).map(topic => (
-        <SliderComponent topic={topic} />
-      ))}
-      {Object.keys(topics).map(topic => (
-        <SliderComponent topic={topic} />
+      {isFetching && <LoadingBar />}
+      {Object.keys(topics).map((topic, index) => (
+        <Slider topic={topic} index={index} key={index} />
       ))}
     </MainDiv>
   );

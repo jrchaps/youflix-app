@@ -1,5 +1,6 @@
 import {
-  SET_FETCHED_VIDEOS,
+  SET_FETCHED_SEARCHED_VIDEOS,
+  SET_FETCHED_HOME_VIDEOS,
   ADD_FAVORITE,
   REMOVE_FAVORITE,
   NETWORK_ERROR,
@@ -7,10 +8,19 @@ import {
 } from './actions';
 import { combineReducers } from 'redux';
 
-const fetchedVideosReducer = (state = {}, action) => {
-  switch (action.type) {
-    case SET_FETCHED_VIDEOS:
-      return { ...state, [action.topic]: action.results };
+const fetchedSearchedVideosReducer = (state = [], { results, type }) => {
+  switch (type) {
+    case SET_FETCHED_SEARCHED_VIDEOS:
+      return [...results];
+    default:
+      return state;
+  }
+};
+
+const fetchedHomeVideosReducer = (state = [], { results, type }) => {
+  switch (type) {
+    case SET_FETCHED_HOME_VIDEOS:
+      return [...results];
     default:
       return state;
   }
@@ -19,9 +29,9 @@ const fetchedVideosReducer = (state = {}, action) => {
 const favoritesReducer = (state = {}, action) => {
   switch (action.type) {
     case ADD_FAVORITE:
-      return { [action.uri]: action.recipe, ...state };
+      return { [action.id]: action.video, ...state };
     case REMOVE_FAVORITE:
-      return { ...delete state[action.uri], ...state };
+      return { ...delete state[action.id], ...state };
     default:
       return state;
   }
@@ -46,7 +56,8 @@ const isFetchingReducer = (state = false, action) => {
 };
 
 export const allReducers = combineReducers({
-  fetchedVideos: fetchedVideosReducer,
+  fetchedHomeVideos: fetchedHomeVideosReducer,
+  fetchedSearchedVideos: fetchedSearchedVideosReducer,
   favorites: favoritesReducer,
   networkError: networkErrorReducer,
   isFetching: isFetchingReducer,
