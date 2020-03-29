@@ -54,7 +54,7 @@ export const fetchHomeVideos = topics => {
     try {
       const promises = Object.keys(topics).map(async topic => {
         const response = await fetch(
-          `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=12&topicId=${topics[topic]}&type=video&videoEmbeddable=true&key=${REACT_APP_API_KEY}`,
+          `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=12&topicId=${topics[topic]}&type=video&videoEmbeddable=true&key=${process.env.REACT_APP_API_KEY}`,
         );
         const data = await response.json();
         return data.items;
@@ -75,7 +75,7 @@ export const fetchSearchedVideos = (query, history) => {
     dispatch(isFetching(true));
     try {
       const response = await fetch(
-        `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=12&q=${query}&type=video&videoEmbeddable=true&key=${REACT_APP_API_KEY}`,
+        `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=12&q=${query}&type=video&videoEmbeddable=true&key=${process.env.REACT_APP_API_KEY}`,
       );
       const data = await response.json();
       dispatch(setFetchedSearchedVideos(data.items));
