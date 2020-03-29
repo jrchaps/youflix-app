@@ -37,7 +37,7 @@ const theme = {
   },
   transitionTimingFunction: 'cubic-bezier(0.4, 0.0, 0.2, 1)',
   itemTransition: '0.3s ease-in 0s',
-  shadow: '0px 1px 3px 1px rgba(0, 0, 0, 0.2)',
+  shadow: '0px 1px 3px 3px rgba(0, 0, 0, 0.2)',
 };
 
 const GlobalStyle = createGlobalStyle`
