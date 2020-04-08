@@ -34,7 +34,7 @@ const WatchPage = () => {
   return (
     <MainDiv>
       <Iframe
-        src={`http://www.youtube.com/embed/${videoId}?autoplay=1`}
+        src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
         allowFullScreen
       ></Iframe>
     </MainDiv>
