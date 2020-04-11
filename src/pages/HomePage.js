@@ -23,6 +23,8 @@ const MainDiv = styled.div`
 let topics = {
   Music: '/m/04rlf',
   Gaming: '/m/0bzvm2',
+  Sports: '/m/06ntj',
+  Entertainment: '/m/02jjt',
   Food: '/m/02wbm',
   Technology: '/m/07c1v',
 };
