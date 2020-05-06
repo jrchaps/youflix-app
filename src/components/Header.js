@@ -125,6 +125,7 @@ const StyledForm = styled.form`
 
 const SearchFormButton = styled.button`
   display: flex;
+  align-items: center;
   cursor: pointer;
   user-select: none;
   background: none;
